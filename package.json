@@ -1,0 +1,12 @@
+{
+  "name": "fancy-league",
+  "version": "3.0.0",
+  "description": "FANCY LEAGUE — car soccer PvP. Developed by Mohsen ~ Danial",
+  "main": "server.js",
+  "author": "Mohsen ~ Danial",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "ws": "^8.18.0" }
+}
