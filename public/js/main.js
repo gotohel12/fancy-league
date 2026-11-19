@@ -3,7 +3,7 @@
 (function () {
 'use strict';
 const D = window.NLD, A = window.NLA, I = window.NLI, R = window.NLGL, E = window.NL, M = window.NLM, N = window.NLN;
-const VERSION = '3.0.1', DEVS = 'Mohsen ~ Danial';
+const VERSION = '3.1.0', DEVS = 'Mohsen ~ Danial';
 const $ = s => document.querySelector(s), ui = $('#ui');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => Number(n).toLocaleString('en-US');

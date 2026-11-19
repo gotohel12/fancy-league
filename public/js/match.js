@@ -268,12 +268,16 @@ class Match {
       const p = add(c.p, m.o), r = V.right(c), ex = add(add(p, c.f, -62), c.u, 2);
       if (c.boosting) {
         const it = D.ITEM[m.look.boost] || D.ITEM.t_std; const c1 = it.c1 === 'team' ? TEAMC2[m.team] : it.c1 === 'rainbow' ? hsl((this.time * 360) % 360, 1, 0.6) : hex(it.c1), c2 = hex(it.c2);
-        P.emit(() => ({ x: ex[0] + rnd(-6, 6), y: ex[1] + rnd(-6, 6), z: ex[2] + rnd(-6, 6), vx: -c.f[0] * rnd(500, 900) + c.v[0] * 0.4, vy: -c.f[1] * rnd(500, 900) + c.v[1] * 0.4, vz: -c.f[2] * rnd(500, 900) + c.v[2] * 0.4, life: rnd(0.12, 0.3), max: 0.3, s: rnd(16, 30), s2: 4, c: c2, c2: c1, drag: 4 }), 3);
+        const bv = (k, sp) => ({ x: ex[0] + rnd(-7, 7), y: ex[1] + rnd(-6, 6), z: ex[2] + rnd(-7, 7), vx: -c.f[0] * sp + c.v[0] * 0.55 + rnd(-60, 60), vy: -c.f[1] * sp + c.v[1] * 0.55 + rnd(-40, 60), vz: -c.f[2] * sp + c.v[2] * 0.55 + rnd(-60, 60) });
+        P.emit(() => Object.assign(bv(0, rnd(500, 900)), { life: rnd(0.12, 0.26), max: 0.26, s: rnd(16, 28), s2: 6, c: c2, c2: c1, drag: 4 }), 4);
+        P.emit(() => Object.assign(bv(0, rnd(250, 500)), { life: rnd(0.35, 0.6), max: 0.6, s: rnd(14, 26), s2: 40, c: c1, c2: [0.12, 0.12, 0.16], a: 0.55, drag: 2.5 }), 2);
+        if (!m.wasBoost) P.emit({ x: ex[0], y: ex[1], z: ex[2], life: 0.25, max: 0.25, s: 160, s2: 30, c: c1, a: 0.8, k: 2 });
         if (it.id === 't_shadow') P.emit({ x: ex[0], y: ex[1], z: ex[2], vx: -c.f[0] * 200, vy: 30, vz: -c.f[2] * 200, life: 0.7, max: 0.7, s: rnd(30, 50), c: [0.08, 0.02, 0.15], a: 0.6, add: false, drag: 2 });
         if (it.id === 't_gold' && Math.random() < 0.5) P.emit({ x: ex[0], y: ex[1], z: ex[2], vx: -c.f[0] * 300 + rnd(-100, 100), vy: rnd(80, 300), vz: -c.f[2] * 300 + rnd(-100, 100), life: 1, max: 1, s: 10, c: [1, 0.85, 0.3], g: 650, k: 3 });
-        m.flame = { ex, f: c.f, c1, c2 };
+        m.flame = { ex, f: c.f, c1, c2, fl: 0.8 + Math.random() * 0.45 };
       }
-      if (c.ss && Math.random() < 0.9) for (const sd of [-1, 1]) { const q = add(ex, r, sd * 30); P.emit({ x: q[0], y: q[1], z: q[2], vx: 0, vy: 0, vz: 0, life: 0.35, max: 0.35, s: 12, s2: 2, c: [1, 1, 1], a: 0.55 }); }
+      m.wasBoost = !!c.boosting;
+      if (c.ss) for (const sd of [-1, 1]) { const q = add(add(ex, r, sd * 34), c.u, 6); P.emit({ x: q[0], y: q[1], z: q[2], vx: 0, vy: 0, vz: 0, life: 0.5, max: 0.5, s: 15, s2: 2, c: [1, 1, 1], a: 0.75 }); }
       m.wr = (m.wr || 0) + (c.g ? V.dot(c.v, c.f) / 15 : 0) * dt;
     }
     const b = G.ball, bp = add(b.p, this.bo);
@@ -291,7 +295,7 @@ class Match {
     if (ball) { dir = [bp[0] - p[0], 0, bp[2] - p[2]]; if (Math.hypot(dir[0], dir[2]) < 50) dir = [c.f[0], 0, c.f[2]]; }
     else { dir = c.g && c.n[1] < 0.7 ? [c.f[0], 0, c.f[2]] : [c.f[0] + c.v[0] * 0.0004, 0, c.f[2] + c.v[2] * 0.0004]; if (Math.hypot(dir[0], dir[2]) < 0.1) dir = m.camDir || [1, 0, 0]; }
     dir = nz(dir);
-    const kk = 1 - Math.exp(-dt * (6 + S.stiff * 14) * ((S.trans || 1.2) / 1.2));
+    const kk = 1 - Math.exp(-dt * (9 + S.stiff * 16) * ((S.trans || 1.2) / 1.2));
     m.camDir = m.camDir ? nz([m.camDir[0] + (dir[0] - m.camDir[0]) * kk, 0, m.camDir[2] + (dir[2] - m.camDir[2]) * kk]) : dir;
     // swivel (right stick) and rear view, like RL
     const rs = m.rs || [0, 0], mag = Math.hypot(rs[0], rs[1]);
@@ -308,8 +312,8 @@ class Match {
     if (ball && !m.rear && !(m.swY && Math.abs(m.swY) > 0.15)) { target = [bp[0], Math.min(bp[1], p[1] + 900), bp[2]]; target = add(scl(target, 0.82), scl(add(p, [0, 60 + (ang + 0.052) * 600, 0]), 0.18)); }
     else target = [eye[0] + d[0] * Math.cos(ang) * 1000, eye[1] + Math.sin(ang) * 1000 - S.height * 0.25, eye[2] + d[2] * Math.cos(ang) * 1000];
     const snap = m.rear !== m.rearPrev; m.rearPrev = m.rear;
-    m.eyeS = m.eyeS && !snap ? add(m.eyeS, [eye[0] - m.eyeS[0], eye[1] - m.eyeS[1], eye[2] - m.eyeS[2]], Math.min(1, dt * 14)) : eye;
-    m.tgtS = m.tgtS && !snap ? add(m.tgtS, [target[0] - m.tgtS[0], target[1] - m.tgtS[1], target[2] - m.tgtS[2]], Math.min(1, dt * 12)) : target;
+    m.eyeS = m.eyeS && !snap ? add(m.eyeS, [eye[0] - m.eyeS[0], eye[1] - m.eyeS[1], eye[2] - m.eyeS[2]], Math.min(1, dt * 22)) : eye;
+    m.tgtS = m.tgtS && !snap ? add(m.tgtS, [target[0] - m.tgtS[0], target[1] - m.tgtS[1], target[2] - m.tgtS[2]], Math.min(1, dt * 18)) : target;
     if (V.len([m.eyeS[0] - eye[0], m.eyeS[1] - eye[1], m.eyeS[2] - eye[2]]) > 1500) { m.eyeS = eye; m.tgtS = target; }
     m.shake = (m.shake || 0) * Math.exp(-dt * 6);
     return { rect, eye: m.eyeS, target: m.tgtS, fov: fovV, shake: m.shake };
@@ -335,7 +339,7 @@ class Match {
           fx.glow(bp[0], bp[1], bp[2], 230, last, 0.16);
           if (self.ballSpeed > 1800) { const k = Math.min(1, (self.ballSpeed - 1800) / 1500); for (let i = 1; i < self.ballTrail.length; i++) { const p0 = self.ballTrail[i - 1], p1 = self.ballTrail[i]; fx.beam(p1[0], p1[1], p1[2], p0[0], p0[1], p0[2], C.BALL_R * 0.8 * (1 - i / 12), last, 0.3 * (1 - i / 12) * k); } }
         }
-        for (const m of self.meta) if (m.flame) { const f = m.flame, e = f.ex; fx.beam(e[0] - f.f[0] * 120, e[1] - f.f[1] * 120, e[2] - f.f[2] * 120, e[0], e[1], e[2], 20, f.c1, 0.9); fx.glow(e[0], e[1], e[2], 50, f.c2, 0.8); }
+        for (const m of self.meta) if (m.flame) { const f = m.flame, e = f.ex, L1 = 190 * f.fl, L2 = 95 * f.fl; fx.beam(e[0] - f.f[0] * L1, e[1] - f.f[1] * L1, e[2] - f.f[2] * L1, e[0], e[1], e[2], 28, f.c1, 0.8); fx.beam(e[0] - f.f[0] * L2, e[1] - f.f[1] * L2, e[2] - f.f[2] * L2, e[0], e[1], e[2], 16, f.c2, 1); fx.glow(e[0], e[1], e[2], 60, f.c1, 0.5); fx.glow(e[0], e[1], e[2], 20, [1, 1, 1], 0.7); }
         self.P.draw(fx);
       }
     });

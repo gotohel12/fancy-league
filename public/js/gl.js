@@ -138,8 +138,8 @@ function buildStatic() {
   for (let x = -LX; x < LX; x += cell) for (let z = -LZ; z < LZ; z += cell) {
     const cx = x + cell / 2, cz = z + cell / 2; if (!(NL.sdf(cx, 2, cz) < 60)) continue;
     const stripe = Math.floor((x + LX) / 512) % 2, t = cx / LX;
-    let col = stripe ? [0.12, 0.27, 0.14] : [0.1, 0.23, 0.12];
-    col = lerp3(col, t < 0 ? BLUE : ORANGE, Math.abs(t) * 0.12);
+    let col = stripe ? [0.13, 0.36, 0.15] : [0.1, 0.29, 0.12];
+    col = lerp3(col, t < 0 ? BLUE : ORANGE, Math.max(0, Math.abs(t) - 0.55) * 0.35);
     F.quad([x, 0, z], [x, 0, z + cell], [x + cell, 0, z + cell], [x + cell, 0, z], col, 0, [0, 1, 0]);
   }
   // goal floors
@@ -322,7 +322,7 @@ function modelArr(names, colorOf) {
 }
 // c[3]: >=0 emissive, -1..0 glossy dielectric, -2..-1 metal (gloss = -c-1)
 const TEAM_BODY = [hex('#1d5cf0'), hex('#f3640e')], TEAM_GLOW = [hex('#4fa0ff'), hex('#ffa040')];
-const FIXED = { DARK: [0.035, 0.04, 0.05, -0.12], CARBON: [0.07, 0.075, 0.085, -0.5], GLASS: [0.025, 0.04, 0.065, -0.95], CHROME: [0.82, 0.85, 0.9, -2], LIGHT_F: [1, 0.97, 0.88, 1], LIGHT_R: [1, 0.08, 0.1, 1], TIRE: [0.045, 0.045, 0.05, -0.04], HUB: [0.2, 0.21, 0.23, -1.45], BRAKE: [0.85, 0.12, 0.1, -0.4], BALL_A: [0.74, 0.76, 0.81, -0.32], BALL_B: [0.13, 0.14, 0.18, -0.55], SEAM: [0.45, 0.8, 1, 0.75] };
+const FIXED = { DARK: [0.035, 0.04, 0.05, -0.12], CARBON: [0.07, 0.075, 0.085, -0.5], GLASS: [0.025, 0.04, 0.065, -0.95], CHROME: [0.82, 0.85, 0.9, -2], LIGHT_F: [1, 0.97, 0.88, 1], LIGHT_R: [1, 0.08, 0.1, 1], TIRE: [0.045, 0.045, 0.05, -0.04], HUB: [0.2, 0.21, 0.23, -1.45], BRAKE: [0.85, 0.12, 0.1, -0.4], BALL_A: [0.56, 0.59, 0.65, -0.5], BALL_B: [0.15, 0.16, 0.2, -0.55], SEAM: [0.55, 0.85, 1, 0.6] };
 const RIMSTYLE = { w_std: 'rim_r5', w_black: 'rim_r10', w_red: 'rim_ry', w_neon: 'rim_turbine', w_gold: 'rim_ry', w_plasma: 'rim_turbine', w_chrome: 'rim_r10', w_turbine: 'rim_turbine' };
 function paintCol(pi) { const c = hex(pi.col); if (pi.id === 'p_chrome' || pi.id === 'p_gold') return [c[0], c[1], c[2], -1.9]; if (pi.id === 'p_mdr') return [c[0], c[1], c[2], 0.35]; return [c[0], c[1], c[2], -0.7]; }
 function buildCarModel(look, team) {
