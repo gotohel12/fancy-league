@@ -3,7 +3,7 @@
 (function () {
 'use strict';
 const D = window.NLD, A = window.NLA, I = window.NLI, R = window.NLGL, E = window.NL, M = window.NLM, N = window.NLN;
-const VERSION = '3.0.0', DEVS = 'Mohsen ~ Danial';
+const VERSION = '3.0.1', DEVS = 'Mohsen ~ Danial';
 const $ = s => document.querySelector(s), ui = $('#ui');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => Number(n).toLocaleString('en-US');
@@ -392,7 +392,14 @@ function ensureNet() {
     const url = N.serverURL(); if (!url) return rej(new Error('noserver'));
     if (net) net.close();
     net = new N.Net(url);
-    try { await net.connect(); } catch (e) { return rej(e); }
+    let ok = false;
+    for (let i = 0; i < 9 && !ok; i++) {          // free server may be asleep: wake it and keep trying ~70s
+      try { await net.connect(); ok = true; } catch (e) {
+        if (i === 0) { toast('السيرفر يصحى… انتظر شوي (أول مرة تاخذ دقيقة تقريبًا)', 9000); try { fetch(url.replace(/^ws/, 'http') + '/health', { mode: 'no-cors' }).catch(() => {}); } catch (x) {} }
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+    if (!ok) return rej(new Error('timeout'));
     if (S.lowBw) net.send({ t: 'rate', r: 2 });
     net.on('room', m => { room = m; if (screen === 'lobby' && scene !== 'match') lobby(); });
     net.on('joined', m => { myPid = m.you; });

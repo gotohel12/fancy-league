@@ -8,7 +8,7 @@ function serverURL() {
   if (s) { let u = s.trim().replace(/\/+$/, ''); if (/^https?:/.test(u)) u = u.replace(/^http/, 'ws'); else if (!/^wss?:/.test(u)) u = 'wss://' + u; return u; }
   if (/^https?:$/.test(location.protocol) && !/^(127\.0\.0\.1|localhost)$/.test(location.hostname) && !/claude|anthropic|usercontent/.test(location.hostname)) return (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host;
   if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname) && location.port && location.port !== '47323') return 'ws://' + location.host;
-  return '';
+  return 'wss://fancy-league.onrender.com'; // official server
 }
 class Net {
   constructor(url) { this.url = url; this.h = {}; this.ws = null; this.rtt = 0; this.jit = 0; this.open = false; this.token = null; this.online = 0; this.manual = false; }
